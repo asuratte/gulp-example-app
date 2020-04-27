@@ -15,13 +15,14 @@ gulp.task('vet', function(done){
     .pipe($.jshint.reporter('fail'));
     done();
 });
-
-gulp.task('styles', function() {
-   // gulp.task('styles', ['clean-styles'], function() {
+    gulp.task('styles', function() {
     log('Compiling LESS --> CSS');
+    
     return gulp
     .src(config.less)
+    .pipe($.plumber())
     .pipe($.less())
+    //.on('error', errorLogger)
     .pipe($.autoprefixer({overrideBrowserslist: ['last 2 version', '> 5%']}))
     .pipe(gulp.dest(config.temp));
 });
@@ -29,10 +30,20 @@ gulp.task('styles', function() {
 gulp.task('clean-styles', function(done) {
 var files = config.temp + '**/*.css';
 clean(files, done);
+});
 
+gulp.task('less-watcher', function(){
+    gulp.watch([config.less], ['styles']);
 });
 
 /////////////
+
+/* function errorLogger(error) {
+    log('*** start of error ***');
+    log(error);
+    log('*** end of error ***');
+    this.emit('end');
+} */
 function clean(path, done){
     log('Cleaning: ' + $.util.colors.blue(path));
     del(path, done);
